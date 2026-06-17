@@ -1,0 +1,424 @@
+:root {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #1f2333;
+  --line: #e2e4ee;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #f6f7fb;
+}
+
+.loading,
+.error {
+  padding: 2rem;
+}
+.error {
+  color: #c0392b;
+}
+
+/* ---- Layout ---------------------------------------------------------- */
+.org-chart {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.org-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+  flex: 0 0 auto;
+  z-index: 5;
+}
+
+.org-canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ---- Breadcrumb + buttons -------------------------------------------- */
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem;
+  overflow: hidden;
+}
+
+.crumb-wrap {
+  display: inline-flex;
+  align-items: center;
+}
+
+.crumb-sep {
+  color: #b8bcce;
+  margin: 0 0.1rem;
+}
+
+.crumb {
+  border: none;
+  background: none;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #5b6076;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.crumb:hover {
+  background: #eef0f7;
+  color: #1f2333;
+}
+.crumb-current {
+  color: #1f2333;
+  font-weight: 600;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+.tool-btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  color: #1f2333;
+}
+.tool-btn:hover:not(:disabled) {
+  background: #eef0f7;
+}
+.tool-btn.active {
+  background: #eef0f7;
+  border-color: #b8bcce;
+  font-weight: 600;
+}
+.tool-btn.primary {
+  border-color: #2f3550;
+  background: #2f3550;
+  color: #fff;
+}
+.tool-btn.primary:hover:not(:disabled) {
+  background: #3c4366;
+}
+.tool-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---- Person node ----------------------------------------------------- */
+.person-node {
+  width: 244px;
+  height: 120px;
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.7rem 0.85rem 0.7rem 0.7rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 4px solid #bbb;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(20, 24, 48, 0.08);
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+  position: relative;
+}
+.person-node:hover {
+  box-shadow: 0 6px 18px rgba(20, 24, 48, 0.14);
+  transform: translateY(-1px);
+}
+.person-node.is-focus {
+  box-shadow: 0 0 0 2px var(--accent), 0 6px 18px rgba(20, 24, 48, 0.16);
+}
+.person-node.is-me {
+  box-shadow: 0 0 0 2px #2f3550, 0 4px 12px rgba(20, 24, 48, 0.16);
+}
+.person-node.is-focus.is-me {
+  box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px #2f3550,
+    0 6px 18px rgba(20, 24, 48, 0.18);
+}
+
+.person-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.person-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.person-body {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.person-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.person-title {
+  font-size: 0.76rem;
+  color: #6a7088;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+.person-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+.level-chip {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #4b5066;
+  background: #eef0f7;
+  border-radius: 5px;
+  padding: 0.05rem 0.32rem;
+}
+.alliance-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.team-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.person-subline {
+  font-size: 0.7rem;
+  color: #6a7088;
+  margin-top: 0.28rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Compact IC node ------------------------------------------------- */
+.ic-node {
+  width: 216px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.55rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 3px solid #bbb;
+  border-radius: 9px;
+  box-shadow: 0 1px 2px rgba(20, 24, 48, 0.06);
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+  position: relative;
+}
+.ic-node:hover {
+  box-shadow: 0 4px 12px rgba(20, 24, 48, 0.13);
+  transform: translateY(-1px);
+}
+.ic-node.is-focus {
+  box-shadow: 0 0 0 2px var(--accent), 0 4px 12px rgba(20, 24, 48, 0.16);
+}
+.ic-node.is-me {
+  box-shadow: 0 0 0 2px #2f3550, 0 3px 9px rgba(20, 24, 48, 0.16);
+}
+.ic-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.ic-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ic-body {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.ic-name {
+  font-weight: 600;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ic-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1px;
+  min-width: 0;
+  overflow: hidden;
+}
+.ic-squad {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+.ic-title {
+  font-size: 0.67rem;
+  color: #7c8298;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* ---- Alliance legend ------------------------------------------------- */
+.org-legend {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  box-shadow: 0 2px 8px rgba(20, 24, 48, 0.08);
+  font-size: 0.72rem;
+}
+.legend-title {
+  font-weight: 700;
+  color: #4b5066;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.64rem;
+}
+.legend-items {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.2rem 0.7rem;
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #4b5066;
+}
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.me-tag {
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 0.08rem 0.4rem;
+  border-radius: 6px;
+}
+
+.node-handle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- Spotlight: dim everything outside the focused team -------------- */
+.react-flow__node {
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+.react-flow__node.node-dimmed {
+  opacity: 0.2;
+  filter: grayscale(0.7) blur(1.4px);
+}
+.react-flow__edge {
+  transition: opacity 0.25s ease;
+}
+.react-flow__edge.edge-dimmed {
+  opacity: 0.1;
+}
+
+/* ---- Filter controls ------------------------------------------------- */
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+.seg-btn {
+  border: none;
+  background: #fff;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  color: #5b6076;
+}
+.seg-btn + .seg-btn {
+  border-left: 1px solid var(--line);
+}
+.seg-btn.active {
+  background: #2f3550;
+  color: #fff;
+}
+.filter-select {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.82rem;
+  background: #fff;
+  color: #1f2333;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
